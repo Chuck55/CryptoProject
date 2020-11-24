@@ -43,7 +43,8 @@ public class Lock {
       //Decodes Public Key
       String PublicKey = publicKeyScanner.nextLine();
       byte[] decodedPublicKey = Base64.getDecoder().decode(PublicKey);
-      SecretKey DecodedPublicKey = new SecretKeySpec(decodedPublicKey, 0, decodedPublicKey.length, publicKeyScanner.nextLine()); // Should be RSA 2048
+      KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
+      PrivateKey DecodedPublicKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decodedPublicKey));
       publicKeyScanner.close();
 
       //Decodes Private Key
@@ -52,7 +53,8 @@ public class Lock {
       String Filesubject2 = privateKeyScanner.nextLine();
       String PrivateKey = privateKeyScanner.nextLine();
       byte[] decodedPrivateKey = Base64.getDecoder().decode(PrivateKey);
-      KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
+      
+      // Converts from bytes to privatekey class
       PrivateKey DecodedPrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decodedPrivateKey));
       privateKeyScanner.close();
       
@@ -75,7 +77,7 @@ public class Lock {
 
       //Creates Digital Signiture and signs keyfile
       Signature signature = Signature.getInstance("SHA256withRSA");
-	  signature.initSign(DecodedPrivateKey); //updates with private key
+	    signature.initSign(DecodedPrivateKey); //updates with private key
     
       byte[] keyfilebytes = Files.readAllBytes(Paths.get("keyfile"));
       signature.update(keyfilebytes);
@@ -86,6 +88,32 @@ public class Lock {
       byte[] digitalSignature = signature.sign();
       FileWriter myWriter = new FileWriter("keyfile.sig");
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
+      myWriter.close();
+      
+      //write all files to directory
+      File dir = new File(directory);
+      if (dir.isDirectory()) {
+        String[] pathnames;
+      	pathnames = dir.list();
+        for (String pathname : pathnames) {
+          File dirFile = new File(pathname);
+          String newFile = dirFile.getName() + ".ci"; // Not sure what this will be.
+          File newFileCreate = new File(newFile);
+          newFileCreate.createNewFile();
+          FileWriter cipherFile = new FileWriter(newFileCreate);
+		  FileInputStream in = new FileInputStream(pathname);
+          byte[] ibuf = new byte[1024];
+          int len;		  
+          while ((len = in.read(ibuf)) != -1) {
+              byte[] obuf = cipher.update(ibuf, 0, len);
+              if ( obuf != null ) {
+                cipherFile.write(Base64.getEncoder().encodeToString(obuf));
+              }
+          }
+          cipherFile.close();
+          in.close();
+        }
+      }
     }
   }
 }
