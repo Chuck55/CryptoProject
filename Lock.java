@@ -44,7 +44,7 @@ public class Lock {
       String PublicKey = publicKeyScanner.nextLine();
       byte[] decodedPublicKey = Base64.getDecoder().decode(PublicKey);
       KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
-      PrivateKey DecodedPublicKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decodedPublicKey));
+      PublicKey DecodedPublicKey = kf.generatePublic(new PKCS8EncodedKeySpec(decodedPublicKey));
       publicKeyScanner.close();
 
       //Decodes Private Key
@@ -60,19 +60,18 @@ public class Lock {
       
       //Creates AES Key
       KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-      keyGen.init(256); // for example
+      keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
+      
+      Cipher cipherAES = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
       
-      //Creates Cipher and ecodes with the Decoded public key
-      Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-      cipher.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
-      
-      // Writes Cipher To File
+      // Writes AES Cipher To File
       File KeyFile = new File("keyfile");
       KeyFile.createNewFile();
       FileOutputStream fosKeyFile = new FileOutputStream("keyfile", true);
-      fosKeyFile.write(cipher.doFinal(AESKEYBYTES));// Encoded Key
+      fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key 
       fosKeyFile.close();
 
       //Creates Digital Signiture and signs keyfile
@@ -90,30 +89,44 @@ public class Lock {
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
       myWriter.close();
       
+      
+      //Creates Cipher and encodes with the AES key
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipher.init(Cipher.ENCRYPT_MODE, AESKey);
+      
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
-        String[] pathnames;
-      	pathnames = dir.list();
-        for (String pathname : pathnames) {
-          File dirFile = new File(pathname);
+        EncryptDirectory(dir, cipher);
+      }
+    }
+  }
+  static public void EncryptDirectory(File dir, Cipher cipher) throws Exception{
+   String[] pathnames;
+      pathnames = dir.list();
+      for (String pathname : pathnames) {
+        File dirFile = new File(pathname);
+        if (dirFile.isDirectory()) {
+          EncryptDirectory(dirFile, cipher);
+        } else {
           String newFile = dirFile.getName() + ".ci"; // Not sure what this will be.
           File newFileCreate = new File(newFile);
           newFileCreate.createNewFile();
-          FileWriter cipherFile = new FileWriter(newFileCreate);
-		  FileInputStream in = new FileInputStream(pathname);
+      		FileOutputStream cipherFile = new FileOutputStream(newFileCreate, true);
+          FileInputStream in = new FileInputStream(pathname);
           byte[] ibuf = new byte[1024];
           int len;		  
           while ((len = in.read(ibuf)) != -1) {
               byte[] obuf = cipher.update(ibuf, 0, len);
               if ( obuf != null ) {
-                cipherFile.write(Base64.getEncoder().encodeToString(obuf));
+                cipherFile.write(obuf);
               }
           }
+          cipherFile.write(cipher.doFinal());         
           cipherFile.close();
           in.close();
-        }
-      }
+	  dirFile.delete();
+        }  
+      } 
     }
-  }
 }
