@@ -63,7 +63,7 @@ public class Lock {
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
       
-      Cipher cipherAES = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      Cipher cipherAES = Cipher.getInstance("AES/GCM/PKCS5Padding");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
       
@@ -91,7 +91,7 @@ public class Lock {
       
       
       //Creates Cipher and encodes with the AES key
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      Cipher cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
       cipher.init(Cipher.ENCRYPT_MODE, AESKey);
       
       //write all files to directory
@@ -125,7 +125,7 @@ public class Lock {
           cipherFile.write(cipher.doFinal());         
           cipherFile.close();
           in.close();
-	  dirFile.delete();
+					dirFile.delete();
         }  
       } 
     }
