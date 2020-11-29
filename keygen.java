@@ -22,33 +22,39 @@ public class keygen {
       File publicFile = new File(publicPath); 
       File privateFile = new File(privatePath);
 
-      publicFile.createNewFile();
-      privateFile.createNewFile();
+      if (!publicFile.createNewFile()) {
+        publicFile.delete();
+        publicFile.createNewFile();
+      }
+      if (!privateFile.createNewFile()) {
+        publicFile.delete();
+        privateFile.createNewFile();
+      }
       KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
       keyPairGenerator.initialize(2048);
       KeyPair keyPair = keyPairGenerator.generateKeyPair();
       Key privateKey = keyPair.getPrivate();
       Key publicKey = keyPair.getPublic();
 
-      FileWriter publicWriter = new FileWriter(publicFile);
+      FileWriter publicWriter = new FileWriter(publicFile, true);
       publicWriter.write(subject);
       publicWriter.write("\n");
       publicWriter.write("RSA 2048");
       publicWriter.write("\n");
       publicWriter.close();
       if (publicKey != null) {
-        FileWriter myWriterpublic = new FileWriter(publicFile);
+        FileWriter myWriterpublic = new FileWriter(publicFile, true);
         myWriterpublic.write(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
         myWriterpublic.close();
       }
-      FileWriter privateWriter = new FileWriter(privateFile);
+      FileWriter privateWriter = new FileWriter(privateFile, true);
       privateWriter.write(subject);
       privateWriter.write("\n");
       privateWriter.write("RSA 2048");
       privateWriter.write("\n");
       privateWriter.close();
       if (privateKey != null) {
-        FileWriter myWriterPrivate = new FileWriter(privateFile);
+        FileWriter myWriterPrivate = new FileWriter(privateFile, true);
         myWriterPrivate.write(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
         myWriterPrivate.close();
       }   
