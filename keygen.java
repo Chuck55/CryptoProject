@@ -19,7 +19,7 @@ public class keygen {
       String publicPath = args[1];
       String privatePath = args[2];
 
-      File publicFile = new File(publicPath);
+      File publicFile = new File(publicPath); 
       File privateFile = new File(privatePath);
 
       publicFile.createNewFile();
@@ -37,9 +37,9 @@ public class keygen {
       publicWriter.write("\n");
       publicWriter.close();
       if (publicKey != null) {
-        FileOutputStream fosPublic = new FileOutputStream(publicFile, true);
-        fosPublic.write(publicKey.getEncoded());
-        fosPublic.close();
+        FileWriter myWriterpublic = new FileWriter(publicFile);
+        myWriterpublic.write(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+        myWriterpublic.close();
       }
       FileWriter privateWriter = new FileWriter(privateFile);
       privateWriter.write(subject);
@@ -48,10 +48,10 @@ public class keygen {
       privateWriter.write("\n");
       privateWriter.close();
       if (privateKey != null) {
-        FileOutputStream fosPrivate = new FileOutputStream(privateFile, true);
-        fosPrivate.write(privateKey.getEncoded());
-        fosPrivate.close();
-      }
+        FileWriter myWriterPrivate = new FileWriter(privateFile);
+        myWriterPrivate.write(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+        myWriterPrivate.close();
+      }   
     }
   }
 }
