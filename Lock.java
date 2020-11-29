@@ -32,6 +32,11 @@ public class Lock {
       String privateKeyPath = args[2];
       String subject = args[3];
       File directoryFile = new File(directory);
+      if (!directoryFile.exists()) {
+          System.out.println("Directory Does not Exist");
+      } else if  (!directoryFile.isDirectory()) {
+          System.out.println("Given directory is not a directory");
+      }
       directory = directoryFile.getAbsolutePath();
  /**
       String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
