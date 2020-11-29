@@ -1,6 +1,7 @@
 // This is Lock
 //possible modules needed taken from: https://www.javainterviewpoint.com/java-aes-256-gcm-encryption-and-decryption/
 import java.security.SecureRandom;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -16,7 +17,7 @@ import java.io.File;  // Import the File class
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 
-public class lock {
+public class Lock {
 	public static void main(String[] args) throws Exception {
     if (args.length != 4) {
       System.out.println("usage: java lock <directory> <action public key> <action private key> <the action subject>");
@@ -26,11 +27,18 @@ public class lock {
       //Generate a random AES key for encryption and tagging, encrypt that key with the unlockingparty’s public key, write that cipher text to a file calledkeyfile.
       //Sign the keyfile with the locker’s private key, write that signature to a file calledkeyfile.sig.
       //Encrypt all files in the given directory using AES in CBC-GCM mode, replacing the plaintext files with the cipher text files.
-    	String directory = args[0];
+      String directory = args[0];
       String publicKeyPath = args[1];
       String privateKeyPath = args[2];
-			String subject = args[3];
-      
+      String subject = args[3];
+      File directoryFile = new File(directory);
+      directory = directoryFile.getAbsolutePath();
+ /**
+      String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
+      String subject = "stuff";
+      String publicKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\public2";
+      String privateKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\private";
+**/
       //Checks that the subjects are the same
       File publicKeyFile = new File(publicKeyPath);
       if (!publicKeyFile.exists()) {
@@ -38,19 +46,20 @@ public class lock {
         return;
       }
       Scanner publicKeyScanner = new Scanner(publicKeyFile);
-      String Filesubject = publicKeyScanner.nextLine();
-      if (Filesubject != subject) {
+      String FileSubject = publicKeyScanner.nextLine();
+      if (!FileSubject.equals(subject)) {
+        System.out.println(FileSubject + " is not the same as " + subject);
         System.out.println("Error: Subject Not Matching");
         return;
       }
-      
       //Decodes Public Key
       String pubAlgo = publicKeyScanner.nextLine(); // not used
       String PublicKey = publicKeyScanner.nextLine(); // this will stop when it hits a newline and the encoded key may have the newline char value causing the private key to be piecemeal
       byte[] decodedPublicKey = Base64.getDecoder().decode(PublicKey);
       KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
-      PublicKey DecodedPublicKey = kf.generatePublic(new PKCS8EncodedKeySpec(decodedPublicKey));
+      PublicKey DecodedPublicKey = kf.generatePublic(new X509EncodedKeySpec(decodedPublicKey));
       publicKeyScanner.close();
+      System.out.println(DecodedPublicKey.toString());
 
       //Decodes Private Key
       File privateKeyFile = new File(privateKeyPath);
@@ -59,72 +68,76 @@ public class lock {
         return;
       }
       Scanner privateKeyScanner = new Scanner(privateKeyFile);
-      String Filesubject2 = privateKeyScanner.nextLine();
+      String FileSubject2 = privateKeyScanner.nextLine();
       // Check if subject is same
-      if (Filesubject2 != subject) {
+      if (!FileSubject2.equals(subject)) {
         System.out.println("Error: Subject Not Matching");
         return;
       }
       String privAlgo = privateKeyScanner.nextLine(); // not used
       String PrivateKey = privateKeyScanner.nextLine(); // this will stop when it hits a newline and the encoded key may have the newline char value causing the private key to be piecemeal
       byte[] decodedPrivateKey = Base64.getDecoder().decode(PrivateKey);
-      
+
       // Converts from bytes to privatekey class
       PrivateKey DecodedPrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decodedPrivateKey));
       privateKeyScanner.close();
-      
+
       // Checking if DecodedPublicKey and DecodedPrivateKey are null
       if (DecodedPublicKey == null || DecodedPrivateKey == null) {
         System.out.println("Error: Decoded Key Is Null");
         return;
       }
-      
+
       //Creates AES Key
       KeyGenerator keyGen = KeyGenerator.getInstance("AES");
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
-      
-      Cipher cipherAES = Cipher.getInstance("AES/GCM/PKCS5Padding");
+
+      KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA");
+      kpgen.initialize(2048);
+      Provider kpgenProv = kpgen.getProvider();
+      System.out.println(kpgenProv.getName());
+      Cipher cipherAES = Cipher.getInstance("RSA");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
-      
+
       // Writes AES Cipher To File
-      File KeyFile = new File("keyfile");
+      File KeyFile = new File(directory + "\\keyfile");
       // Delete file if exists
       if (!KeyFile.createNewFile()) {
         KeyFile.delete();
         KeyFile.createNewFile();
       }
-    
+
       FileOutputStream fosKeyFile = new FileOutputStream("keyfile", true);
-      fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key 
+      fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key
       fosKeyFile.close();
 
       //Creates Digital Signiture and signs keyfile
       Signature signature = Signature.getInstance("SHA256withRSA");
 	    signature.initSign(DecodedPrivateKey); //updates with private key
-    
+
       byte[] keyfilebytes = Files.readAllBytes(Paths.get("keyfile"));
       signature.update(keyfilebytes);
-      
+
       //Creates Sig file and writes signiture to sig file
-      File KeyFileSig = new File("keyfile.sig");
+      File KeyFileSig = new File(directory + "\\keyfile.sig");
       // Error checking here
       if (!KeyFileSig.createNewFile()) {
         KeyFileSig.delete();
         KeyFileSig.createNewFile();
       }
-  
+
       byte[] digitalSignature = signature.sign();
       FileWriter myWriter = new FileWriter("keyfile.sig");
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
       myWriter.close();
-      
-      
+
+
       //Creates Cipher and encodes with the AES key
-      Cipher cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
+      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
       cipher.init(Cipher.ENCRYPT_MODE, AESKey);
-      
+
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
@@ -139,7 +152,7 @@ public class lock {
    String[] pathnames;
       pathnames = dir.list();
       for (String pathname : pathnames) {
-        File dirFile = new File(pathname);
+        File dirFile = new File(dir.getAbsolutePath() + "\\"+ pathname);
         if (dirFile.isDirectory()) {
           EncryptDirectory(dirFile, cipher);
         } else {
@@ -153,20 +166,20 @@ public class lock {
       		FileOutputStream cipherFile = new FileOutputStream(newFileCreate);
           FileInputStream in = new FileInputStream(pathname);
           byte[] ibuf = new byte[1024];
-          int len;		  
+          int len;
           while ((len = in.read(ibuf)) != -1) {
               byte[] obuf = cipher.update(ibuf, 0, len);
               if ( obuf != null ) {
                 cipherFile.write(obuf);
               }
           }
-          cipherFile.write(cipher.doFinal());         
+          cipherFile.write(cipher.doFinal());
           cipherFile.close();
           in.close();
           if (!dirFile.delete()) {
             System.out.println("Error in deleting directory.");
           }
-        }  
-      } 
+        }
+      }
     }
 }
