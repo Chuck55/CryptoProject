@@ -125,7 +125,7 @@ public class unlock {
         }
         // right now keyfilebytes, the secret AES key, is encrypted with recipients public key, we must decrypt it
         // it's also encoded so will need to turn into a SecretKey
-        Cipher cipherAES = Cipher.getInstance("AES/GCM/PKCS5Padding");
+        Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipherAES.init(Cipher.DECRYPT_MODE, DecodedPrivateKey); //uses private key to decrypt the secret key
         // run all through the cipher
         byte[] AESKEYBYTES = cipherAES.doFinal(keyfilebytes); // decrypt the aes key to byte array

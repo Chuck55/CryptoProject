@@ -98,7 +98,7 @@ public class Lock {
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
 
-      Cipher cipherAES = Cipher.getInstance("RSA");
+      Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
       // Writes AES Cipher To File
