@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 import java.nio.file.Files;
 import java.io.File;  // Import the File class
+import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 
@@ -48,8 +49,9 @@ public class unlock {
 
         Scanner publicKeyScanner = new Scanner(publicKeyFile);
         String Filesubject = publicKeyScanner.nextLine();
-        if (Filesubject != subject) {
-            System.out.println("Error: Subject Not Matching");
+        if (!Filesubject.equals(subject)) {
+            System.out.println("Filesubject: " + Filesubject + ", subject: " + subject);
+	    System.out.println("Error: Subject Not Matching");
             return;
         }
 
@@ -58,7 +60,7 @@ public class unlock {
         String PublicKey = publicKeyScanner.nextLine(); // this will stop when it hits a newline or eof
         byte[] decodedPublicKey = Base64.getDecoder().decode(PublicKey);
         KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
-        PublicKey DecodedPublicKey = kf.generatePublic(new PKCS8EncodedKeySpec(decodedPublicKey));
+        PublicKey DecodedPublicKey = kf.generatePublic(new X509EncodedKeySpec(decodedPublicKey));
         publicKeyScanner.close();
 
         //Decodes Private Key
@@ -96,7 +98,7 @@ public class unlock {
         // TODO verify the integrity of the keyfile using the locking party's public key and keyfile.sig
 
         //the keyfile signature is in the directory passed so append /keyfile.sig to the directory to open
-        File fileKeySig = new File(directory + "/keyfile.sig");
+        File fileKeySig = new File(directory + "\\keyfile.sig");
         if (!fileKeySig.canRead()){
             System.out.println("Can't read the keyfile.sig file.");
             return;
@@ -109,7 +111,7 @@ public class unlock {
         byte[] keySigByteArray = Base64.getDecoder().decode(keySigString);
 
         //extract the AES key from keyfile
-        byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "keyfile"));
+        byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
 
         //create a signature object
         Signature sign = Signature.getInstance("SHA256withRSA");
@@ -131,10 +133,11 @@ public class unlock {
         byte[] AESKEYBYTES = cipherAES.doFinal(keyfilebytes); // decrypt the aes key to byte array
         //convert byte[] to SecretKey
         SecretKey AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
+        SecretKeySpec skey = new SecretKeySpec(AESKEYBYTES, "AES");
 
         // TODO delete keyfile and keyfile.sig
 
-        File myObj = new File(directory + "keyfile");
+        File myObj = new File(directory + "\\keyfile");
         if (myObj.delete()) {
             System.out.println("Deleted the file: " + myObj.getName());
         } else {
@@ -142,7 +145,7 @@ public class unlock {
             return;
         }
 
-        File myObj2 = new File(directory +"keyfile.sig");
+        File myObj2 = new File(directory +"\\keyfile.sig");
         if (myObj2.delete()) {
             System.out.println("Deleted the file: " + myObj2.getName());
         } else {
@@ -150,7 +153,7 @@ public class unlock {
         }
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, AESKey);
+        cipher.init(Cipher.DECRYPT_MODE, skey);
 
         File dir = new File(directory);
         if (dir.isDirectory()) {

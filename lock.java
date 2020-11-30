@@ -17,7 +17,7 @@ import java.io.File;  // Import the File class
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 
-public class Lock {
+public class lock {
   public static void main(String[] args) throws Exception {
     if (args.length != 4) {
       System.out.println("usage: java lock <directory> <action public key> <action private key> <the action subject>");
@@ -140,7 +140,7 @@ public class Lock {
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
-        //EncryptDirectory(dir, cipher);
+        EncryptDirectory(dir, cipher);
       } else {
         System.out.println("Error: Directory Invalid");
         return;
