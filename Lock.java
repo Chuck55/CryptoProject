@@ -114,7 +114,7 @@ public class Lock {
         KeyFile.createNewFile();
       }
 
-      FileOutputStream fosKeyFile = new FileOutputStream("keyfile", true);
+      FileOutputStream fosKeyFile = new FileOutputStream(directory + "\\keyfile", true);
       fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key
       fosKeyFile.close();
 
@@ -122,7 +122,7 @@ public class Lock {
       Signature signature = Signature.getInstance("SHA256withRSA");
 	    signature.initSign(DecodedPrivateKey); //updates with private key
 
-      byte[] keyfilebytes = Files.readAllBytes(Paths.get("keyfile"));
+      byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
       signature.update(keyfilebytes);
 
       //Creates Sig file and writes signiture to sig file
@@ -134,7 +134,7 @@ public class Lock {
       }
 
       byte[] digitalSignature = signature.sign();
-      FileWriter myWriter = new FileWriter("keyfile.sig");
+      FileWriter myWriter = new FileWriter(directory + "\\keyfile.sig");
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
       myWriter.close();
 
