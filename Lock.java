@@ -18,7 +18,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 
 public class Lock {
-	public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
     if (args.length != 4) {
       System.out.println("usage: java lock <directory> <action public key> <action private key> <the action subject>");
       return;
@@ -33,17 +33,17 @@ public class Lock {
       String subject = args[3];
       File directoryFile = new File(directory);
       if (!directoryFile.exists()) {
-          System.out.println("Directory Does not Exist");
-      } else if  (!directoryFile.isDirectory()) {
-          System.out.println("Given directory is not a directory");
+        System.out.println("Directory Does not Exist");
+      } else if (!directoryFile.isDirectory()) {
+        System.out.println("Given directory is not a directory");
       }
       directory = directoryFile.getAbsolutePath();
- /**
-      String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
-      String subject = "stuff";
-      String publicKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\public2";
-      String privateKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\private";
-**/
+/**
+ String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
+ String subject = "stuff";
+ String publicKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\public2";
+ String privateKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\private";
+ **/
       //Checks that the subjects are the same
       File publicKeyFile = new File(publicKeyPath);
       if (!publicKeyFile.exists()) {
@@ -98,14 +98,9 @@ public class Lock {
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
 
-      KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA");
-      kpgen.initialize(2048);
-      Provider kpgenProv = kpgen.getProvider();
-      System.out.println(kpgenProv.getName());
-      Cipher cipherAES = Cipher.getInstance("RSA");
+      Cipher cipherAES = Cipher.getInstance("AES/GCM/NoPadding");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
-
       // Writes AES Cipher To File
       File KeyFile = new File(directory + "\\keyfile");
       // Delete file if exists
@@ -120,7 +115,7 @@ public class Lock {
 
       //Creates Digital Signiture and signs keyfile
       Signature signature = Signature.getInstance("SHA256withRSA");
-	    signature.initSign(DecodedPrivateKey); //updates with private key
+      signature.initSign(DecodedPrivateKey); //updates with private key
 
       byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
       signature.update(keyfilebytes);
@@ -146,45 +141,45 @@ public class Lock {
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
-        EncryptDirectory(dir, cipher);
+        //EncryptDirectory(dir, cipher);
       } else {
         System.out.println("Error: Directory Invalid");
-      	return;
+        return;
       }
     }
   }
   static public void EncryptDirectory(File dir, Cipher cipher) throws Exception {
-   String[] pathnames;
-      pathnames = dir.list();
-      for (String pathname : pathnames) {
-        File dirFile = new File(dir.getAbsolutePath() + "\\"+ pathname);
-        if (dirFile.isDirectory()) {
-          EncryptDirectory(dirFile, cipher);
-        } else {
-          String newFile = dirFile.getName() + ".ci"; // Not sure what this will be.
-          // Error checking if file exists
-          File newFileCreate = new File(newFile);
-          if (!newFileCreate.createNewFile()) {
-            newFileCreate.delete();
-            newFileCreate.createNewFile();
+    String[] pathnames;
+    pathnames = dir.list();
+    for (String pathname : pathnames) {
+      File dirFile = new File(dir.getAbsolutePath() + "\\"+ pathname);
+      if (dirFile.isDirectory()) {
+        EncryptDirectory(dirFile, cipher);
+      } else {
+        String newFile = dirFile.getName() + ".ci"; // Not sure what this will be.
+        // Error checking if file exists
+        File newFileCreate = new File(newFile);
+        if (!newFileCreate.createNewFile()) {
+          newFileCreate.delete();
+          newFileCreate.createNewFile();
+        }
+        FileOutputStream cipherFile = new FileOutputStream(newFileCreate);
+        FileInputStream in = new FileInputStream(pathname);
+        byte[] ibuf = new byte[1024];
+        int len;
+        while ((len = in.read(ibuf)) != -1) {
+          byte[] obuf = cipher.update(ibuf, 0, len);
+          if ( obuf != null ) {
+            cipherFile.write(obuf);
           }
-      		FileOutputStream cipherFile = new FileOutputStream(newFileCreate);
-          FileInputStream in = new FileInputStream(pathname);
-          byte[] ibuf = new byte[1024];
-          int len;
-          while ((len = in.read(ibuf)) != -1) {
-              byte[] obuf = cipher.update(ibuf, 0, len);
-              if ( obuf != null ) {
-                cipherFile.write(obuf);
-              }
-          }
-          cipherFile.write(cipher.doFinal());
-          cipherFile.close();
-          in.close();
-          if (!dirFile.delete()) {
-            System.out.println("Error in deleting directory.");
-          }
+        }
+        cipherFile.write(cipher.doFinal());
+        cipherFile.close();
+        in.close();
+        if (!dirFile.delete()) {
+          System.out.println("Error in deleting directory.");
         }
       }
     }
+  }
 }
