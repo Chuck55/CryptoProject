@@ -38,12 +38,12 @@ public class Lock {
         System.out.println("Given directory is not a directory");
       }
       directory = directoryFile.getAbsolutePath();
-/**
- String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
- String subject = "stuff";
- String publicKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\public2";
- String privateKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\private";
- **/
+      /**
+       String directory = "C:\\Users\\kylej\\OneDrive\\Desktop\\WHOO";
+       String subject = "stuff";
+       String publicKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\public2";
+       String privateKeyPath = "C:\\Users\\kylej\\OneDrive\\Desktop\\CryptoProject\\private";
+       **/
       //Checks that the subjects are the same
       File publicKeyFile = new File(publicKeyPath);
       if (!publicKeyFile.exists()) {
@@ -98,7 +98,7 @@ public class Lock {
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
 
-      Cipher cipherAES = Cipher.getInstance("AES/GCM/NoPadding");
+      Cipher cipherAES = Cipher.getInstance("RSA");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
       // Writes AES Cipher To File
@@ -137,7 +137,6 @@ public class Lock {
       //Creates Cipher and encodes with the AES key
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
       cipher.init(Cipher.ENCRYPT_MODE, AESKey);
-
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
