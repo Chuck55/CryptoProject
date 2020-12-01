@@ -184,7 +184,7 @@ public class unlock {
             } else {
                 String newPTFilename = dirFile.getName().substring(0, dirFile.getName().length()-3); // cuts off the last 3 letters, namely the ".ci"
                 // Error checking if file exists
-                File newPTFileCreate = new File(newPTFilename);
+                File newPTFileCreate = new File(dir.getAbsolutePath() + "/"+ newPTFilename);
                 if (!newPTFileCreate.createNewFile()) {
                     newPTFileCreate.delete();
                     newPTFileCreate.createNewFile();
@@ -203,7 +203,7 @@ public class unlock {
                 PTFile.close();
                 CI_in.close();
                 if (!dirFile.delete()) {
-                    System.out.println("Error in deleting directory.");
+                    System.out.println("Error in deleting file.");
                 }
             }
         }
