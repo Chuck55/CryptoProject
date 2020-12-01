@@ -98,6 +98,10 @@ public class lock {
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
 
+      // Initialization vector
+      byte[] iv = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+      IvParameterSpec ivspec = new IvParameterSpec(iv);
+
       Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
@@ -136,7 +140,7 @@ public class lock {
 
       //Creates Cipher and encodes with the AES key
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, AESKey);
+      cipher.init(Cipher.ENCRYPT_MODE, AESKey, ivspec);
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {

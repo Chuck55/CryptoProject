@@ -133,7 +133,10 @@ public class unlock {
         byte[] AESKEYBYTES = cipherAES.doFinal(keyfilebytes); // decrypt the aes key to byte array
         //convert byte[] to SecretKey
         SecretKey AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
-        SecretKeySpec skey = new SecretKeySpec(AESKEYBYTES, "AES");
+
+        // reading in initialization vector
+        byte[] iv = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+        IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         // TODO delete keyfile and keyfile.sig
 
@@ -153,7 +156,7 @@ public class unlock {
         }
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, skey);
+        cipher.init(Cipher.DECRYPT_MODE, AESKey, ivspec);
 
         File dir = new File(directory);
         if (dir.isDirectory()) {
