@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.io.File;  // Import the File class
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 
 public class lock {
   public static void main(String[] args) throws Exception {
