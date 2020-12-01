@@ -100,7 +100,7 @@ public class unlock {
         // TODO verify the integrity of the keyfile using the locking party's public key and keyfile.sig
 
         //the keyfile signature is in the directory passed so append /keyfile.sig to the directory to open
-        File fileKeySig = new File(directory + "\\keyfile.sig");
+        File fileKeySig = new File(directory + "/keyfile.sig");
         if (!fileKeySig.canRead()){
             System.out.println("Can't read the keyfile.sig file.");
             return;
@@ -114,7 +114,7 @@ public class unlock {
 
         //extract the AES key from keyfile
         // byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
-        FileInputStream keyfile = new FileInputStream(directory + "\\keyfile");
+        FileInputStream keyfile = new FileInputStream(directory + "/keyfile");
         byte[] keyfilebytes = new byte[256];
         keyfile.read(keyfilebytes);
         byte[] iv = new byte[16];
@@ -145,7 +145,7 @@ public class unlock {
 
         // TODO delete keyfile and keyfile.sig
 
-        File myObj = new File(directory + "\\keyfile");
+        File myObj = new File(directory + "/keyfile");
         if (myObj.delete()) {
             System.out.println("Deleted the file: " + myObj.getName());
         } else {
@@ -153,7 +153,7 @@ public class unlock {
             return;
         }
 
-        File myObj2 = new File(directory +"\\keyfile.sig");
+        File myObj2 = new File(directory +"/keyfile.sig");
         if (myObj2.delete()) {
             System.out.println("Deleted the file: " + myObj2.getName());
         } else {
@@ -178,7 +178,7 @@ public class unlock {
         String[] pathnames;
         pathnames = dir.list();
         for (String pathname : pathnames) {
-            File dirFile = new File(dir.getAbsolutePath() + "\\"+ pathname);
+            File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
             if (dirFile.isDirectory()) {
                 DecryptDirectory(dirFile, cipher);
             } else {

@@ -105,14 +105,14 @@ public class lock {
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
       byte[] AESKEYBYTES = AESKey.getEncoded();
       // Writes AES Cipher To File
-      File KeyFile = new File(directory + "\\keyfile");
+      File KeyFile = new File(directory + "/keyfile");
       // Delete file if exists
       if (!KeyFile.createNewFile()) {
         KeyFile.delete();
         KeyFile.createNewFile();
       }
 
-      FileOutputStream fosKeyFile = new FileOutputStream(directory + "\\keyfile", true);
+      FileOutputStream fosKeyFile = new FileOutputStream(directory + "/keyfile", true);
       fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key
       fosKeyFile.write(iv);
       fosKeyFile.close();
@@ -121,11 +121,11 @@ public class lock {
       Signature signature = Signature.getInstance("SHA256withRSA");
       signature.initSign(DecodedPrivateKey); //updates with private key
 
-      byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
+      byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "/keyfile"));
       signature.update(keyfilebytes);
 
       //Creates Sig file and writes signiture to sig file
-      File KeyFileSig = new File(directory + "\\keyfile.sig");
+      File KeyFileSig = new File(directory + "/keyfile.sig");
       // Error checking here
       if (!KeyFileSig.createNewFile()) {
         KeyFileSig.delete();
@@ -133,7 +133,7 @@ public class lock {
       }
 
       byte[] digitalSignature = signature.sign();
-      FileWriter myWriter = new FileWriter(directory + "\\keyfile.sig");
+      FileWriter myWriter = new FileWriter(directory + "/keyfile.sig");
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
       myWriter.close();
 
@@ -155,7 +155,7 @@ public class lock {
     String[] pathnames;
     pathnames = dir.list();
     for (String pathname : pathnames) {
-      File dirFile = new File(dir.getAbsolutePath() + "\\"+ pathname);
+      File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
       if (dirFile.isDirectory()) {
         EncryptDirectory(dirFile, cipher);
       } else {
