@@ -19,7 +19,7 @@ public class keygen {
       String publicPath = args[1];
       String privatePath = args[2];
 
-      File publicFile = new File(publicPath); 
+      File publicFile = new File(publicPath);
       File privateFile = new File(privatePath);
 
       if (!publicFile.createNewFile()) {
@@ -36,7 +36,7 @@ public class keygen {
       Key privateKey = keyPair.getPrivate();
       Key publicKey = keyPair.getPublic();
 
-      FileWriter publicWriter = new FileWriter(publicFile, true);
+      FileWriter publicWriter = new FileWriter(publicFile);
       publicWriter.write(subject);
       publicWriter.write("\n");
       publicWriter.write("RSA 2048");
@@ -47,7 +47,7 @@ public class keygen {
         myWriterpublic.write(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
         myWriterpublic.close();
       }
-      FileWriter privateWriter = new FileWriter(privateFile, true);
+      FileWriter privateWriter = new FileWriter(privateFile);
       privateWriter.write(subject);
       privateWriter.write("\n");
       privateWriter.write("RSA 2048");
@@ -57,7 +57,7 @@ public class keygen {
         FileWriter myWriterPrivate = new FileWriter(privateFile, true);
         myWriterPrivate.write(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
         myWriterPrivate.close();
-      }   
+      }
     }
   }
 }
