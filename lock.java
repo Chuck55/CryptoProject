@@ -167,7 +167,7 @@ public class lock {
           newFileCreate.createNewFile();
         }
         FileOutputStream cipherFile = new FileOutputStream(newFileCreate);
-        FileInputStream in = new FileInputStream(pathname);
+        FileInputStream in = new FileInputStream(dir.getAbsolutePath() + "\\"+ pathname);
         byte[] ibuf = new byte[1024];
         int len;
         while ((len = in.read(ibuf)) != -1) {
