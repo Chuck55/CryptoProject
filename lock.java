@@ -158,8 +158,10 @@ public class lock {
       File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
       if (dirFile.isDirectory()) {
         EncryptDirectory(dirFile, cipher);
+      } else if (pathname.equals("keyfile") || pathname.equals("keyfile.sig")) {
+        continue;
       } else {
-        String newFile = dirFile.getName() + ".ci"; // Not sure what this will be.
+        String newFile = dir.getAbsolutePath() + "/" + dirFile.getName() + ".ci"; // Not sure what this will be.
         // Error checking if file exists
         File newFileCreate = new File(newFile);
         if (!newFileCreate.createNewFile()) {
@@ -180,7 +182,7 @@ public class lock {
         cipherFile.close();
         in.close();
         if (!dirFile.delete()) {
-          System.out.println("Error in deleting directory.");
+          System.out.println("Error in deleting file.");
         }
       }
     }
