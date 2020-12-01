@@ -20,7 +20,7 @@ import javax.crypto.spec.IvParameterSpec;
 public class unlock {
     public static void main(String[] args) throws Exception {
         if (args.length != 4) {
-            System.out.println("usage: java Unlock <directory> <action public key> <action private key> <the action subject>");
+            System.out.println("usage: java unlock <directory> <action public key> <action private key> <the action subject>");
             return;
         }
         // TODO verify subject of public key file matches the subject given in the -s argument

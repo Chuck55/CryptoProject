@@ -98,6 +98,7 @@ public class lock {
       KeyGenerator keyGen = KeyGenerator.getInstance("AES");
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
+      SecretKeySpec AESKeySpec = new SecretKeySpec(AESKey.getEncoded(), "AES");
 
       // Initialization vector
       byte[] iv = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -141,7 +142,7 @@ public class lock {
 
       //Creates Cipher and encodes with the AES key
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, AESKey, ivspec);
+      cipher.init(Cipher.ENCRYPT_MODE, AESKeySpec, ivspec);
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
