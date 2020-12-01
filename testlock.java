@@ -149,7 +149,9 @@ public class lock {
             PublicKey DecodedPublicKeyz = kfz.generatePublic(new X509EncodedKeySpec(decodedPublicKeyz));
             publicKeyScanner2.close();
 
-            signature.initVerify(DecodedPublicKeyz);
+            if (signature.initVerify(DecodedPublicKeyz)) {
+		System.out.println("VERIFIED");
+		}
             signature.update(keyfilebytes);
             signature.verify(digitalSignature);
 
