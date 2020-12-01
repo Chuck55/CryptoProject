@@ -16,6 +16,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 
 public class unlock {
     public static void main(String[] args) throws Exception {
@@ -118,7 +119,7 @@ public class unlock {
         keyfile.read(keyfilebytes);
         byte[] iv = new byte[16];
         keyfile.read(iv);
-        IvParameterSpec ivspec = new IvParameterSpec(iv);
+        GCMParameterSpec spec = new GCMParameterSpec(128, iv);
         keyfile.close();
 
         //create a signature object
@@ -160,7 +161,7 @@ public class unlock {
         }
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, AESKey, ivspec);
+        cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
 
         File dir = new File(directory);
         if (dir.isDirectory()) {

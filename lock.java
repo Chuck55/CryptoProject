@@ -17,6 +17,7 @@ import java.io.File;  // Import the File class
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.KeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 
 public class lock {
   public static void main(String[] args) throws Exception {
@@ -102,7 +103,7 @@ public class lock {
       // Initialization vector
       byte[] iv = new byte[16];
       new SecureRandom().nextBytes(iv);
-      IvParameterSpec ivspec = new IvParameterSpec(iv);
+      GCMParameterSpec spec = new GCMParameterSpec(128, iv);
 
       Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
       cipherAES.init(Cipher.ENCRYPT_MODE, DecodedPublicKey);
@@ -143,7 +144,7 @@ public class lock {
 
       //Creates Cipher and encodes with the AES key
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, AESKey, ivspec);
+      cipher.init(Cipher.ENCRYPT_MODE, AESKey, spec);
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
