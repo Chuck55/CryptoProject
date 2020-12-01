@@ -76,11 +76,7 @@ public class lock {
       }
       Scanner privateKeyScanner = new Scanner(privateKeyFile);
       String FileSubject2 = privateKeyScanner.nextLine();
-      // Check if subject is same
-      if (!FileSubject2.equals(subject)) {
-        System.out.println("Error: Subject Not Matching");
-        return;
-      }
+
       String privAlgo = privateKeyScanner.nextLine(); // not used
       String PrivateKey = privateKeyScanner.nextLine(); // this will stop when it hits a newline and the encoded key may have the newline char value causing the private key to be piecemeal
       byte[] decodedPrivateKey = Base64.getDecoder().decode(PrivateKey);
