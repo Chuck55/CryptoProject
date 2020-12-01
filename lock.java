@@ -98,10 +98,10 @@ public class lock {
       KeyGenerator keyGen = KeyGenerator.getInstance("AES");
       keyGen.init(128); // for example
       SecretKey AESKey = keyGen.generateKey();
-      SecretKeySpec AESKeySpec = new SecretKeySpec(AESKey.getEncoded(), "AES");
 
       // Initialization vector
-      byte[] iv = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
+      byte[] iv = new byte[16];
+      srandom.nextBytes(iv);
       IvParameterSpec ivspec = new IvParameterSpec(iv);
 
       Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -117,6 +117,7 @@ public class lock {
 
       FileOutputStream fosKeyFile = new FileOutputStream(directory + "\\keyfile", true);
       fosKeyFile.write(cipherAES.doFinal(AESKEYBYTES));// Encoded Key
+      fosKeyFile.write(iv);
       fosKeyFile.close();
 
       //Creates Digital Signiture and signs keyfile
@@ -142,7 +143,7 @@ public class lock {
 
       //Creates Cipher and encodes with the AES key
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, AESKeySpec, ivspec);
+      cipher.init(Cipher.ENCRYPT_MODE, AESKey, ivspec);
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {

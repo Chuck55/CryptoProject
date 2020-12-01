@@ -112,7 +112,14 @@ public class unlock {
         byte[] keySigByteArray = Base64.getDecoder().decode(keySigString);
 
         //extract the AES key from keyfile
-        byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
+        // byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
+        FileInputStream keyfile = new FileInputStream(directory + "\\keyfile");
+        byte[] keyfilebytes = new byte[256];
+        keyfile.read(keyfilebytes);
+        byte[] iv = new byte[16];
+        keyfile.read(iv);
+        IvParameterSpec ivspec = new IvParameterSpec(iv);
+        keyfile.close();
 
         //create a signature object
         Signature sign = Signature.getInstance("SHA256withRSA");
@@ -134,10 +141,6 @@ public class unlock {
         byte[] AESKEYBYTES = cipherAES.doFinal(keyfilebytes); // decrypt the aes key to byte array
         //convert byte[] to SecretKey
         SecretKey AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
-
-        // reading in initialization vector
-        byte[] iv = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
-        IvParameterSpec ivspec = new IvParameterSpec(iv);
 
         // TODO delete keyfile and keyfile.sig
 
