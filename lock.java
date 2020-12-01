@@ -101,7 +101,7 @@ public class lock {
 
       // Initialization vector
       byte[] iv = new byte[16];
-      srandom.nextBytes(iv);
+      new SecureRandom().nextBytes(iv);
       IvParameterSpec ivspec = new IvParameterSpec(iv);
 
       Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
