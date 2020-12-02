@@ -114,7 +114,7 @@ public class lock {
 
       FileOutputStream fosKeyFile = new FileOutputStream(directory + "/keyfile", true);
       byte [] FinalAESKEYBYTES = cipherAES.doFinal(AESKEYBYTES);
-      System.out.println(x.length);
+      System.out.println(FinalAESKEYBYTES.length);
       fosKeyFile.write(FinalAESKEYBYTES);// Encoded Key
       fosKeyFile.write(iv);
       fosKeyFile.close();
