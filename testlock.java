@@ -19,7 +19,7 @@ import java.security.KeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.GCMParameterSpec;
 
-public class lock {
+public class testlock {
     public static void main(String[] args) throws Exception {
         if (args.length != 4) {
             System.out.println("usage: java lock <directory> <action public key> <action private key> <the action subject>");
@@ -133,9 +133,10 @@ public class lock {
             }
 
             byte[] digitalSignature = signature.sign();
-
-            Scanner publicKeyScanner2 = new Scanner(directory + "//pub1");
+            File y = new File("pub1");
+            Scanner publicKeyScanner2 = new Scanner(y);
             String FileSubject3 = publicKeyScanner2.nextLine();
+	    System.out.println(FileSubject3);
             if (!FileSubject3.equals(subject)) {
                 System.out.println(FileSubject3 + " is not the same as " + subject);
                 System.out.println("Error: Subject Not Matching");
@@ -147,14 +148,14 @@ public class lock {
             byte[] decodedPublicKeyz = Base64.getDecoder().decode(PublicKeyz);
             KeyFactory kfz = KeyFactory.getInstance("RSA"); // or "EC" or whatever
             PublicKey DecodedPublicKeyz = kfz.generatePublic(new X509EncodedKeySpec(decodedPublicKeyz));
-            publicKeyScanner2.close();
-
-            if (signature.initVerify(DecodedPublicKeyz)) {
-		System.out.println("VERIFIED");
-		}
+            publicKeyScanner2.close(); 
+           signature.initVerify(DecodedPublicKeyz);
             signature.update(keyfilebytes);
-            signature.verify(digitalSignature);
 
+           var x = signature.verify(digitalSignature);
+            if (x) { 
+              System.out.println("hello");
+            }
             FileWriter myWriter = new FileWriter(directory + "\\keyfile.sig");
             myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
             myWriter.close();
