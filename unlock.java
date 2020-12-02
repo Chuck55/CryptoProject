@@ -114,11 +114,11 @@ public class unlock {
 
         //extract the AES key from keyfile
         // byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
-        FileInputStream keyfile = new FileInputStream(directory + "/keyfile");
-        byte[] keyfilebytes = new byte[256];
-        keyfile.read(keyfilebytes);
-        byte[] iv = new byte[16];
-        keyfile.read(iv);
+        byte[] keyfilebytesOrig = Files.readAllBytes(Paths.get(directory + "/keyfile")); // origional bytes in file including iv
+	byte[] keyfilebytes = new byte[keyfilebytesOrig.Length-16]; // Storage for signed bytes
+        byte[] iv = new byte[16]; // storage for iv bytes
+	Array.Copy(keyfilebytesOrig, keyfilebytesOrig.Length-16, iv, 0, 16); // Copies the last 16 bytes into iv array
+	Array.Copy(keyfilebytesOrig, 0, keyfilebytes, 0, keyfilebytesOrig.Length-16); // Copies remaining bytes for updating
         GCMParameterSpec spec = new GCMParameterSpec(128, iv);
         keyfile.close();
 
