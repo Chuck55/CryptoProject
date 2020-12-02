@@ -1,6 +1,5 @@
 import java.nio.Buffer;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -115,12 +114,13 @@ public class unlock {
 
     //extract the AES key from keyfile
     // byte[] keyfilebytes = Files.readAllBytes(Paths.get(directory + "\\keyfile"));
-    byte[] keyfilebytesOrig = Files.readAllBytes(Paths.get(directory + "/keyfile")); // origional bytes in file including iv
-    byte[] keyfilebytes = new byte[keyfilebytesOrig.length-16]; // Storage for signed bytes
-    byte[] iv = new byte[16]; // storage for iv bytes
-    Arrays.copyOfRange(iv, keyfilebytesOrig.length-16, keyfilebytesOrig.length);
-    Arrays.copyOfRange(keyfilebytes, 0, keyfilebytesOrig.length-16);
+    FileInputStream keyfile = new FileInputStream(directory + "/keyfile");
+    byte[] keyfilebytes = new byte[256];
+    keyfile.read(keyfilebytes);
+    byte[] iv = new byte[16];
+    keyfile.read(iv);
     GCMParameterSpec spec = new GCMParameterSpec(128, iv);
+    keyfile.close();
 
     //create a signature object
     Signature sign = Signature.getInstance("SHA256withRSA");
