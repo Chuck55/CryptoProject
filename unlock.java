@@ -24,30 +24,24 @@ public class unlock {
             System.out.println("usage: java unlock <directory> <action public key> <action private key> <the action subject>");
             return;
         }
-        // TODO verify subject of public key file matches the subject given in the -s argument
-
         String directory = args[0];
-        System.out.println("arg0 is: " + directory);
         String publicKeyPath = args[1];
-        System.out.println("arg1 is: " + publicKeyPath);
         String privateKeyPath = args[2];
-        System.out.println("arg2 is: " + privateKeyPath);
         String subject = args[3];
-        System.out.println("arg3 is: " + subject);
 
         File directoryFile = new File(directory);
         if (!directoryFile.exists()) {
-            System.out.println("Directory Does not Exist");
-	    return;
+            System.out.println("Error: Directory Does not Exist");
+	          return;
         } else if  (!directoryFile.isDirectory()) {
-            System.out.println("Given directory is not a directory");
+            System.out.println("Error: Given directory is not a directory");
             return ;
         }
         directory = directoryFile.getAbsolutePath();
 
         File publicKeyFile = new File(publicKeyPath);
         if (!publicKeyFile.canRead()){
-            System.out.println("Can't read the public key file.");
+            System.out.println("Error: Can't read the public key file.");
             return;
         }
 
@@ -55,7 +49,7 @@ public class unlock {
         String Filesubject = publicKeyScanner.nextLine();
         if (!Filesubject.equals(subject)) {
             System.out.println("Filesubject: " + Filesubject + ", subject: " + subject);
-	    System.out.println("Error: Subject Not Matching");
+	          System.out.println("Error: Subject Not Matching");
             return;
         }
 
@@ -75,13 +69,6 @@ public class unlock {
         }
         Scanner privateKeyScanner = new Scanner(privateKeyFile);
         String Filesubject2 = privateKeyScanner.nextLine();
-        // no need to check if subject is same as this is the callers private key
-        /*
-        if (Filesubject2 != subject) {
-            System.out.println("Error: Subject Not Matching");
-            return;
-        }
-        */
 
         String privAlgo = privateKeyScanner.nextLine(); // not used
         String PrivateKey = privateKeyScanner.nextLine(); // this will stop when it hits a newline or eof
@@ -98,13 +85,10 @@ public class unlock {
         }
 
         //now we have usable private and public Key objects
-
-        // TODO verify the integrity of the keyfile using the locking party's public key and keyfile.sig
-
         //the keyfile signature is in the directory passed so append /keyfile.sig to the directory to open
         File fileKeySig = new File(directory + "/keyfile.sig");
         if (!fileKeySig.canRead()){
-            System.out.println("Can't read the keyfile.sig file.");
+            System.out.println("Error: Can't read the keyfile.sig file.");
             return;
         }
         //extract the signature. it has been encoded as a string and we need it as a byte array before validating the signature
@@ -134,11 +118,11 @@ public class unlock {
         boolean bool = sign.verify(keySigByteArray);
 
         if(!bool) {
-            System.out.println("keyfile signature failed"); // validation failure point
-            return;       
-	 } else {
-		System.out.println("Success!");
-	}
+            System.out.println("Error: Keyfile signature failed"); // validation failure point
+            return;
+        } else {
+		        System.out.println("Success!");
+	      }
         // right now keyfilebytes, the secret AES key, is encrypted with recipients public key, we must decrypt it
         // it's also encoded so will need to turn into a SecretKey
         Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -148,23 +132,19 @@ public class unlock {
         //convert byte[] to SecretKey
         SecretKey AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
 
-        // TODO delete keyfile and keyfile.sig
+        // delete keyfile and keyfile.sig
 
         File myObj = new File(directory + "/keyfile");
-        if (myObj.delete()) {
-            System.out.println("Deleted the file: " + myObj.getName());
-        } else {
-            System.out.println("Failed to delete the file."); // validation failure
+        if (!myObj.delete()) {
+            System.out.println("Error: Failed to delete keyfile"); // validation failure
             return;
         }
 
         File myObj2 = new File(directory +"/keyfile.sig");
-        if (myObj2.delete()) {
-            System.out.println("Deleted the file: " + myObj2.getName());
-        } else {
-            System.out.println("Failed to delete the file."); // validation failure
+        if (!myObj2.delete()) {
+            System.out.println("Error: Failed to delete the keyfile.sig"); // validation failure
             return;
-	    }
+	      }
         // update 3DEC2020 no longer instantiating the decrypt cipher in main. now done in decryptdirectory
         //Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         //cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
@@ -178,7 +158,7 @@ public class unlock {
         }
     }
     // at this point the AES key extracted AESKEYBYTES can be used to decrypt the files
-    // TODO decrypt the directory replacing the cipher text files with the plain text files
+    // decrypt the directory replacing the cipher text files with the plain text files
 
     static public void DecryptDirectory(File dir, SecretKey AESKey, GCMParameterSpec spec) throws Exception {
         String[] pathnames;
@@ -186,7 +166,6 @@ public class unlock {
         for (String pathname : pathnames) {
             File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
             if (dirFile.isDirectory()) {
-
                 DecryptDirectory(dirFile, AESKey, spec);
             } else {
                 String newPTFilename = dirFile.getName().substring(0, dirFile.getName().length()-3); // cuts off the last 3 letters, namely the ".ci"

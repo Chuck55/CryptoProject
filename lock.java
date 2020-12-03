@@ -35,9 +35,11 @@ public class lock {
       String subject = args[3];
       File directoryFile = new File(directory);
       if (!directoryFile.exists()) {
-        System.out.println("Directory Does not Exist");
+        System.out.println("Error: Directory Does not Exist");
+        return;
       } else if (!directoryFile.isDirectory()) {
-        System.out.println("Given directory is not a directory");
+        System.out.println("Error: Given directory is not a directory");
+        return;
       }
       directory = directoryFile.getAbsolutePath();
       /**
@@ -66,7 +68,6 @@ public class lock {
       KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
       PublicKey DecodedPublicKey = kf.generatePublic(new X509EncodedKeySpec(decodedPublicKey));
       publicKeyScanner.close();
-      System.out.println(DecodedPublicKey.toString());
 
       //Decodes Private Key
       File privateKeyFile = new File(privateKeyPath);
@@ -114,7 +115,6 @@ public class lock {
 
       FileOutputStream fosKeyFile = new FileOutputStream(directory + "/keyfile", true);
       byte [] FinalAESKEYBYTES = cipherAES.doFinal(AESKEYBYTES);
-      System.out.println(FinalAESKEYBYTES.length);
       fosKeyFile.write(FinalAESKEYBYTES);// Encoded Key
       fosKeyFile.write(iv);
       fosKeyFile.close();
@@ -137,7 +137,6 @@ public class lock {
       FileWriter myWriter = new FileWriter(directory + "/keyfile.sig");
       myWriter.write(Base64.getEncoder().encodeToString(digitalSignature));
       myWriter.close();
-
 
       //Creates Cipher and encodes with the AES key
       //Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -189,6 +188,7 @@ public class lock {
         in.close();
         if (!dirFile.delete()) {
           System.out.println("Error in deleting file.");
+          return;
         }
       }
     }
