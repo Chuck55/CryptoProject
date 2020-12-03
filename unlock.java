@@ -38,8 +38,10 @@ public class unlock {
         File directoryFile = new File(directory);
         if (!directoryFile.exists()) {
             System.out.println("Directory Does not Exist");
+	    return;
         } else if  (!directoryFile.isDirectory()) {
             System.out.println("Given directory is not a directory");
+            return ;
         }
         directory = directoryFile.getAbsolutePath();
 
@@ -133,7 +135,10 @@ public class unlock {
 
         if(!bool) {
             System.out.println("keyfile signature failed"); // validation failure point
-        }
+            return;       
+	 } else {
+		System.out.println("Success!");
+	}
         // right now keyfilebytes, the secret AES key, is encrypted with recipients public key, we must decrypt it
         // it's also encoded so will need to turn into a SecretKey
         Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -158,7 +163,8 @@ public class unlock {
             System.out.println("Deleted the file: " + myObj2.getName());
         } else {
             System.out.println("Failed to delete the file."); // validation failure
-        }
+            return;
+	}
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
@@ -204,6 +210,7 @@ public class unlock {
                 CI_in.close();
                 if (!dirFile.delete()) {
                     System.out.println("Error in deleting file.");
+                    return;
                 }
             }
         }
