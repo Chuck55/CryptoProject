@@ -164,14 +164,14 @@ public class unlock {
         } else {
             System.out.println("Failed to delete the file."); // validation failure
             return;
-	}
-
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
+	    }
+        // update 3DEC2020 no longer instantiating the decrypt cipher in main. now done in decryptdirectory
+        //Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        //cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
 
         File dir = new File(directory);
         if (dir.isDirectory()) {
-            DecryptDirectory(dir, cipher);
+            DecryptDirectory(dir, AESKey, spec);
         } else {
             System.out.println("Error: Directory Invalid");
             return;
@@ -180,13 +180,14 @@ public class unlock {
     // at this point the AES key extracted AESKEYBYTES can be used to decrypt the files
     // TODO decrypt the directory replacing the cipher text files with the plain text files
 
-    static public void DecryptDirectory(File dir, Cipher cipher) throws Exception {
+    static public void DecryptDirectory(File dir, SecretKey AESKey, GCMParameterSpec spec) throws Exception {
         String[] pathnames;
         pathnames = dir.list();
         for (String pathname : pathnames) {
             File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
             if (dirFile.isDirectory()) {
-                DecryptDirectory(dirFile, cipher);
+
+                DecryptDirectory(dirFile, AESKey, spec);
             } else {
                 String newPTFilename = dirFile.getName().substring(0, dirFile.getName().length()-3); // cuts off the last 3 letters, namely the ".ci"
                 // Error checking if file exists
@@ -199,6 +200,9 @@ public class unlock {
                 FileInputStream CI_in = new FileInputStream(dirFile);
                 byte[] ibuf = new byte[1024];
                 int len;
+                //Update 3DEC2020 instantiate a new cipher for each file
+                Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                cipher.init(Cipher.DECRYPT_MODE, AESKey, spec);
                 while ((len = CI_in.read(ibuf)) != -1) {
                     byte[] obuf = cipher.update(ibuf, 0, len);
                     if ( obuf != null ) {

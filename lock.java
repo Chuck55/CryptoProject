@@ -140,25 +140,27 @@ public class lock {
 
 
       //Creates Cipher and encodes with the AES key
-      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE, AESKey, spec);
+      //Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+      //cipher.init(Cipher.ENCRYPT_MODE, AESKey, spec);
       //write all files to directory
       File dir = new File(directory);
       if (dir.isDirectory()) {
-        EncryptDirectory(dir, cipher);
+        EncryptDirectory(dir, AESKey, spec);
       } else {
         System.out.println("Error: Directory Invalid");
         return;
       }
     }
   }
-  static public void EncryptDirectory(File dir, Cipher cipher) throws Exception {
+
+  //Update 3DEC2020 now the method parameters take a a secret key (AES) and the IV (spec)
+  static public void EncryptDirectory(File dir, SecretKey AESKey, GCMParameterSpec spec) throws Exception {
     String[] pathnames;
     pathnames = dir.list();
     for (String pathname : pathnames) {
       File dirFile = new File(dir.getAbsolutePath() + "/"+ pathname);
       if (dirFile.isDirectory()) {
-        EncryptDirectory(dirFile, cipher);
+        EncryptDirectory(dirFile, AESKey, spec);
       } else if (pathname.equals("keyfile") || pathname.equals("keyfile.sig")) {
         continue;
       } else {
@@ -173,6 +175,9 @@ public class lock {
         FileInputStream in = new FileInputStream(dir.getAbsolutePath() + "/"+ pathname);
         byte[] ibuf = new byte[1024];
         int len;
+        // Update 3DEC2020 now instantiating cipher in the method before encrypting
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, AESKey, spec);
         while ((len = in.read(ibuf)) != -1) {
           byte[] obuf = cipher.update(ibuf, 0, len);
           if ( obuf != null ) {
