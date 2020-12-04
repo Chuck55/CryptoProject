@@ -11,13 +11,27 @@ import java.io.*;
 
 public class keygen {
 	public static void main(String[] args) throws Exception {
-    if (args.length != 3) {
-      System.out.println("usage: java keygen <subject> <public key file> <private key file>");
+    if (args.length != 6) {
+      System.out.println("usage: java keygen -s <subject> -pub <public key file> -priv <private key file>");
       return;
     } else {
-      String subject = args[0];
-      String publicPath = args[1];
-      String privatePath = args[2];
+			String subject = "";
+      String publicPath = "";
+      String privatePath = "";
+			// update to use flags that can be out of order
+			for (int i = 0; i < 6; i=i+2) {
+				if (args[i].equals("-s")) { // subject flag
+					subject = args[i+1];
+					continue;
+				}
+				if (args[i].equals("-pub")) { // public key flag
+					publicPath = args[i+1];
+					continue;
+				}
+				if (args[i].equals("-priv")) { // private key flag
+					privatePath = args[i+1];
+				}
+			}
 
       File publicFile = new File(publicPath);
       File privateFile = new File(privatePath);

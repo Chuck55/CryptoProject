@@ -21,18 +21,39 @@ import javax.crypto.spec.GCMParameterSpec;
 
 public class lock {
   public static void main(String[] args) throws Exception {
-    if (args.length != 4) {
-      System.out.println("usage: java lock <directory> <action public key> <action private key> <the action subject>");
+    if (args.length != 8) {
+      System.out.println("usage: java lock -d <directory> -p <action public key> -r <action private key> -s <the action subject>");
       return;
     } else {
       //Validate  that  the  subject  in  the  action  public  key  file  matches  the  subject  given  in  the  -sargument.
       //Generate a random AES key for encryption and tagging, encrypt that key with the unlockingparty’s public key, write that cipher text to a file calledkeyfile.
       //Sign the keyfile with the locker’s private key, write that signature to a file calledkeyfile.sig.
       //Encrypt all files in the given directory using AES in CBC-GCM mode, replacing the plaintext files with the cipher text files.
-      String directory = args[0];
-      String publicKeyPath = args[1];
-      String privateKeyPath = args[2];
-      String subject = args[3];
+
+      //update for flag checking
+      String directory = "";
+      String publicKeyPath = "";
+      String privateKeyPath = "";
+      String subject = "";
+
+      for (int i = 0; i < 8; i=i+2) {
+        if (args[i].equals("-s")) { // subject flag
+					subject = args[i+1];
+          continue;
+				}
+				if (args[i].equals("-p")) { // public key flag
+					publicKeyPath = args[i+1];
+          continue;
+				}
+				if (args[i].equals("-r")) { // private key flag
+					privateKeyPath = args[i+1];
+          continue;
+				}
+        if (args[i].equals("-d")) { // directory flag
+          directory = args[i+1];
+        }
+      }
+
       File directoryFile = new File(directory);
       if (!directoryFile.exists()) {
         System.out.println("Error: Directory Does not Exist");

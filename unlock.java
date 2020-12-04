@@ -20,14 +20,32 @@ import javax.crypto.spec.GCMParameterSpec;
 
 public class unlock {
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
-            System.out.println("usage: java unlock <directory> <action public key> <action private key> <the action subject>");
+        if (args.length != 8) {
+            System.out.println("usage: java unlock -d <directory> -p <action public key> -r <action private key> -s <the action subject>");
             return;
         }
-        String directory = args[0];
-        String publicKeyPath = args[1];
-        String privateKeyPath = args[2];
-        String subject = args[3];
+        String directory = "";
+        String publicKeyPath = "";
+        String privateKeyPath = "";
+        String subject = "";
+
+        for (int i = 0; i < 8; i=i+2) {
+          if (args[i].equals("-s")) { // subject flag
+  					subject = args[i+1];
+            continue;
+  				}
+  				if (args[i].equals("-p")) { // public key flag
+  					publicKeyPath = args[i+1];
+            continue;
+  				}
+  				if (args[i].equals("-r")) { // private key flag
+  					privateKeyPath = args[i+1];
+            continue;
+  				}
+          if (args[i].equals("-d")) { // directory flag
+            directory = args[i+1];
+          }
+        }
 
         File directoryFile = new File(directory);
         if (!directoryFile.exists()) {
