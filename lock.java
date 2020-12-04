@@ -36,22 +36,34 @@ public class lock {
       String privateKeyPath = "";
       String subject = "";
 
+      boolean s = false, p = false, r = false, d = false;
+
       for (int i = 0; i < 8; i=i+2) {
         if (args[i].equals("-s")) { // subject flag
 					subject = args[i+1];
+          s = true;
           continue;
 				}
 				if (args[i].equals("-p")) { // public key flag
 					publicKeyPath = args[i+1];
+          p = true;
           continue;
 				}
 				if (args[i].equals("-r")) { // private key flag
 					privateKeyPath = args[i+1];
+          r = true;
           continue;
 				}
         if (args[i].equals("-d")) { // directory flag
+          d = true;
           directory = args[i+1];
         }
+      }
+
+      if (!(s && p && r && d)) {
+        System.out.println("Error: Each flag is required.");
+        System.out.println("usage: java lock -d <directory> -p <action public key> -r <action private key> -s <the action subject>");
+        return;
       }
 
       File directoryFile = new File(directory);

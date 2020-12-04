@@ -18,19 +18,31 @@ public class keygen {
 			String subject = "";
       String publicPath = "";
       String privatePath = "";
+
+			boolean s = false, pub = false, priv = false;
+
 			// update to use flags that can be out of order
 			for (int i = 0; i < 6; i=i+2) {
 				if (args[i].equals("-s")) { // subject flag
 					subject = args[i+1];
+					s = true;
 					continue;
 				}
 				if (args[i].equals("-pub")) { // public key flag
 					publicPath = args[i+1];
+					pub = true;
 					continue;
 				}
 				if (args[i].equals("-priv")) { // private key flag
+					priv = true;
 					privatePath = args[i+1];
 				}
+			}
+
+			if (!(s && pub && priv)) {
+				System.out.println("Error: Each flag is required.");
+				System.out.println("usage: java keygen -s <subject> -pub <public key file> -priv <private key file>");
+				return;
 			}
 
       File publicFile = new File(publicPath);
