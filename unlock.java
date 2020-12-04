@@ -152,6 +152,7 @@ public class unlock {
             return;
         }
 
+        SecretKey AESKey;
         try {
           // right now keyfilebytes, the secret AES key, is encrypted with recipients public key, we must decrypt it
           // it's also encoded so will need to turn into a SecretKey
@@ -160,7 +161,7 @@ public class unlock {
           // run all through the cipher
           byte[] AESKEYBYTES = cipherAES.doFinal(keyfilebytes); // decrypt the aes key to byte array
           //convert byte[] to SecretKey
-          SecretKey AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
+          AESKey = new SecretKeySpec(AESKEYBYTES, 0, AESKEYBYTES.length, "AES");
         } catch (Exception e) {
           System.out.println("Error: Decryption failed");
           return;
