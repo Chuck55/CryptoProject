@@ -149,6 +149,8 @@ public class lock {
         System.out.println("Error: Directory Invalid");
         return;
       }
+
+      System.out.println("Directory successfully encrypted. Exiting.");
     }
   }
 

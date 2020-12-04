@@ -120,9 +120,8 @@ public class unlock {
         if(!bool) {
             System.out.println("Error: Keyfile signature failed"); // validation failure point
             return;
-        } else {
-		        System.out.println("Success!");
-	      }
+        }
+
         // right now keyfilebytes, the secret AES key, is encrypted with recipients public key, we must decrypt it
         // it's also encoded so will need to turn into a SecretKey
         Cipher cipherAES = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -156,6 +155,8 @@ public class unlock {
             System.out.println("Error: Directory Invalid");
             return;
         }
+
+        System.out.println("Directory successfully decrypted. Exiting.");
     }
     // at this point the AES key extracted AESKEYBYTES can be used to decrypt the files
     // decrypt the directory replacing the cipher text files with the plain text files
