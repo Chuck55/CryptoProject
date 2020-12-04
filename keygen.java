@@ -45,6 +45,11 @@ public class keygen {
 				return;
 			}
 
+			if (publicPath.equals(privatePath)) {
+				System.out.println("Error: Public path and private path cannot be the same");
+				return;
+			}
+
       File publicFile = new File(publicPath);
       File privateFile = new File(privatePath);
 

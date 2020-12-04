@@ -66,6 +66,11 @@ public class lock {
         return;
       }
 
+      if (publicKeyPath.equals(privateKeyPath)) {
+        System.out.println("Error: Public key and private key cannot be the same");
+        return;
+      }
+
       File directoryFile = new File(directory);
       if (!directoryFile.exists()) {
         System.out.println("Error: Directory Does not Exist");
